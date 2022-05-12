@@ -1,0 +1,11 @@
+---
+name: minereset38
+version: 0.0.1
+main: kingofturkey38\minereset38\Main
+api: 4.3.1
+src-namespace-prefix: kingofturkey38\minereset38
+
+permissions:
+  minereset38.mine:
+    default: op
+...

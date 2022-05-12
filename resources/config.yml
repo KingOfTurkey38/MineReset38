@@ -1,0 +1,6 @@
+---
+blockReplaceTick: 3000 #how many blocks this should replace in a tick, 1 tick = 1/20 of a second
+
+messages:
+  mine-reset-announcement: "Mine {mine} is resetting."
+...
