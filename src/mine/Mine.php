@@ -8,7 +8,9 @@ use JsonSerializable;
 use kingofturkey38\minereset38\events\MineResetEvent;
 use kingofturkey38\minereset38\Main;
 use pocketmine\block\BlockFactory;
+use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
+use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\world\World;
 
@@ -39,6 +41,15 @@ class Mine implements JsonSerializable{
 		$maxZ = max($this->pos1->getZ(), $this->pos2->getZ());
 		$minY = min($this->pos1->getY(), $this->pos2->getY());
 		$maxY = max($this->pos1->getY(), $this->pos2->getY());
+		$bb = new AxisAlignedBB($minX, $minY, $minZ, $maxX, $maxY, $maxZ);
+
+		foreach($world->getCollidingEntities($bb) as $e){
+			if($e instanceof Player){
+				$e->teleport($world->getSafeSpawn());
+			}
+		}
+
+
 		$blocks = yield $this->getBlocksAsRandomArray();
 
 		$count = 0;
