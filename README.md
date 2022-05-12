@@ -2,6 +2,8 @@
 High performance mine reset plugin for PocketMine-MP 4.0.0
 Unlike other plugins, this plugin is not threaded but asynchronous.
 
+When a mine resets, it teleports the players inside the mine to the spawnpoint of that world.
+
 # Reset speed
 By default mines will reset at a speed of 3000 blocks a tick.
 This amount can be increased/decreased in the config.
