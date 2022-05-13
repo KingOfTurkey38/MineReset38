@@ -79,7 +79,7 @@ class Mine implements JsonSerializable{
 		$end = time();
 		$time = $end - $started;
 
-		var_dump("Took {$time}s to replace " . number_format($total) . " blocks");
+		//var_dump("Took {$time}s to replace " . number_format($total) . " blocks");
 
 		return true;
 	}
