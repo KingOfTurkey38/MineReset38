@@ -34,7 +34,7 @@ class MineAddMetaBlockSubCommand extends BaseSubCommand{
 			return;
 		}
 
-		$block = BlockFactory::getInstance()->get($args["blockID"], $data["blockMeta"]);
+		$block = BlockFactory::getInstance()->get($args["blockID"], $args["blockMeta"]);
 		if($block instanceof UnknownBlock){
 			$p->sendMessage(Main::PREFIX . "Invalid block id & meta combination");
 			return;
