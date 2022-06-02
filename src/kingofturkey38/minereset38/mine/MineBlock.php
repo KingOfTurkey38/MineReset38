@@ -23,7 +23,7 @@ class MineBlock implements JsonSerializable{
 	public function jsonSerialize(){
 		return [
 			"blockID" => $this->block->getId(),
-			"meta" => $this->block->getDamage(),
+			"meta" => $this->block->getMeta(),
 			"chance" => $this->chance
 		];
 	}
