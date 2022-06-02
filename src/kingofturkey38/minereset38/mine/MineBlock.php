@@ -17,12 +17,13 @@ class MineBlock implements JsonSerializable{
 	}
 
 	public static function jsonDeserialize(array $data) : self{
-		return new MineBlock(BlockFactory::getInstance()->get($data["blockID"], 0), $data["chance"]);
+		return new MineBlock(BlockFactory::getInstance()->get($data["blockID"], $data["meta"] ?? 0), $data["chance"]);
 	}
 
 	public function jsonSerialize(){
 		return [
 			"blockID" => $this->block->getId(),
+			"meta" => $this->block->getDamage(),
 			"chance" => $this->chance
 		];
 	}
