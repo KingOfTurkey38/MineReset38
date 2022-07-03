@@ -34,6 +34,8 @@ class Main extends PluginBase{
 
 
 		$this->getServer()->getCommandMap()->register("minereset38", new MineCommand($this, "mine"));
+
+		MineRegistry::getInstance();
 	}
 
 	protected function onDisable() : void{
