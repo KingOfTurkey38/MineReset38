@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace kingofturkey38\minereset38\mine;
 
+use Generator;
 use JsonSerializable;
 use kingofturkey38\minereset38\events\MineResetEvent;
 use kingofturkey38\minereset38\Main;
-use pocketmine\block\BlockFactory;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
@@ -17,22 +17,24 @@ use pocketmine\world\World;
 class Mine implements JsonSerializable{
 
 
-	public function tryReset(){
+	public function tryReset(): Generator{
 		$event = new MineResetEvent($this);
 		$event->call();
 
-		if($event->isCancelled()) return;
+		if($event->isCancelled()) return false;
 
 		$this->lastReset = time();
 
 		if(($world = Server::getInstance()->getWorldManager()->getWorldByName($this->world)) !== null){
 			Server::getInstance()->broadcastMessage(str_replace("{mine}", $this->name, Main::getInstance()->getConfig()->getNested("messages.mine-reset-announcement")));
 
-			yield $this->reset($world);
+			return yield $this->reset($world);
 		}
+
+		return false;
 	}
 
-	public function reset(World $world){
+	public function reset(World $world): Generator{
 		$std = Main::getInstance()->getStd();
 
 		$minX = min($this->pos1->getX(), $this->pos2->getX());

@@ -29,11 +29,16 @@ class MineResetSubCommand extends BaseSubCommand{
 
 		Await::f2c(function() use ($mine, $p){
 			$p->sendMessage(Main::PREFIX . "Trying to reset mine §c{$mine->name}");
-			yield $mine->tryReset();
+			$result = yield $mine->tryReset();
 
 			if(!$p->isOnline()) return;
 
-			$p->sendMessage(Main::PREFIX . "mine has been reset.");
+			if($result === false){
+				$p->sendMessage(Main::PREFIX . "Failed to reset mine §c{$mine->name}");
+				return;
+			}
+
+			$p->sendMessage(Main::PREFIX . "Mine §c{$mine->name}§7 has been reset.");
 		});
 	}
 }
