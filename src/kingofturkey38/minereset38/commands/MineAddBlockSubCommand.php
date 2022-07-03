@@ -14,7 +14,6 @@ use pocketmine\block\BlockFactory;
 use pocketmine\block\UnknownBlock;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
-use SOFe\AwaitGenerator\Await;
 
 class MineAddBlockSubCommand extends BaseSubCommand{
 	protected function prepare() : void{

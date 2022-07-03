@@ -20,6 +20,7 @@ class MineCommand extends BaseCommand{
 		$this->registerSubCommand(new MineResetTimeSubCommand("setresettime"));
 		$this->registerSubCommand(new MineDeleteSubCommand("delete"));
 		$this->registerSubCommand(new MineResetAllSubCommand("resetall"));
+		$this->registerSubCommand(new MineAddMetaBlockSubCommand("addmetablock"));
 	}
 
 	public function onRun(CommandSender $sender, string $aliasUsed, array $args) : void{ }
