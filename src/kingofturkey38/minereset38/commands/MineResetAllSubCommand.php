@@ -21,7 +21,7 @@ class MineResetAllSubCommand extends BaseSubCommand{
 				$this->msg($p, Main::PREFIX . "Trying to reset mine §c{$mine->name}");
 
 
-				$result = yield $mine->tryReset();
+				$result = yield from $mine->tryReset();
 
 				if($result === true){
 					$this->msg($p, Main::PREFIX . "Mine §c{$mine->name}§7 has been reset.");
