@@ -28,7 +28,7 @@ class Mine implements JsonSerializable{
 		if(($world = Server::getInstance()->getWorldManager()->getWorldByName($this->world)) !== null){
 			Server::getInstance()->broadcastMessage(str_replace("{mine}", $this->name, Main::getInstance()->getConfig()->getNested("messages.mine-reset-announcement")));
 
-			return yield $this->reset($world);
+			return yield from $this->reset($world);
 		}
 
 		return false;
@@ -52,7 +52,7 @@ class Mine implements JsonSerializable{
 		}
 
 
-		$blocks = yield $this->getBlocksAsRandomArray();
+		$blocks = yield from $this->getBlocksAsRandomArray();
 
 		$count = 0;
 		$total = 0;
@@ -69,7 +69,7 @@ class Mine implements JsonSerializable{
 
 					if($count >= Main::$blockReplaceTick){
 						$count = 0;
-						yield $std->sleep(1);
+						yield from $std->sleep(1);
 					}
 
 					$set = $blocks[array_rand($blocks)];
@@ -95,7 +95,7 @@ class Mine implements JsonSerializable{
 				$arr[] = $block->block;
 			}
 
-			yield $std->sleep(1);
+			yield from $std->sleep(1);
 		}
 
 		return $arr;

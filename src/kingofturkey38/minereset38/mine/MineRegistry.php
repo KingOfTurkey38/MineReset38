@@ -42,11 +42,11 @@ class MineRegistry{
 
 					if(count($mine->blocks) > 0){
 						if(time() >= $nextReset){
-							yield $mine->tryReset();
+							yield from $mine->tryReset();
 						}
 					}
 
-					yield $std->sleep(12);
+					yield from $std->sleep(12);
 					continue;
 				}
 

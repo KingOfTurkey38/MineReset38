@@ -33,9 +33,9 @@ class MineCreateSubCommand extends BaseSubCommand{
 		Await::f2c(function() use ($p, $args, $name){
 
 			$p->sendMessage(Main::PREFIX . "Break a block to select the first position");
-			if(($pos1 = yield $this->getMinePosition($p)) !== false){
+			if(($pos1 = yield from $this->getMinePosition($p)) !== false){
 				$p->sendMessage(Main::PREFIX . "Break a block to select the second position");
-				if(($pos2 = yield $this->getMinePosition($p)) !== false){
+				if(($pos2 = yield from $this->getMinePosition($p)) !== false){
 					if(!$p->isOnline()) return;
 
 					$mine = new Mine($name, $pos1, $pos2, $p->getWorld()->getFolderName(), [], abs($args["reset time"]), time());
@@ -61,7 +61,7 @@ class MineCreateSubCommand extends BaseSubCommand{
 		$std = Main::getInstance()->getStd();
 
 
-		$data = yield Await::race(
+		$data = yield from Await::race(
 			[
 				$std->sleep(20 * 60),
 				$std->awaitEvent(BlockBreakEvent::class, fn(BlockBreakEvent $e) : bool => $e->getPlayer()->getName() === $p->getName(), false, EventPriority::MONITOR, true),
