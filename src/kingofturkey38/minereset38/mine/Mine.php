@@ -26,7 +26,10 @@ class Mine implements JsonSerializable{
 		$this->lastReset = time();
 
 		if(($world = Server::getInstance()->getWorldManager()->getWorldByName($this->world)) !== null){
-			Server::getInstance()->broadcastMessage(str_replace("{mine}", $this->name, Main::getInstance()->getConfig()->getNested("messages.mine-reset-announcement")));
+			$broadcast = trim(str_replace("{mine}", $this->name, Main::getInstance()->getConfig()->getNested("messages.mine-reset-announcement")));
+			if ($broadcast !== "") {
+				Server::getInstance()->broadcastMessage($broadcast);
+			}
 
 			return yield from $this->reset($world);
 		}
