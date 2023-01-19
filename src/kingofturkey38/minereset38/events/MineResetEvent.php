@@ -12,9 +12,16 @@ use pocketmine\event\Event;
 class MineResetEvent extends Event implements Cancellable{
 	use CancellableTrait;
 
-	public function __construct(protected Mine $mine){ }
+	public function __construct(protected Mine $mine, protected bool $diff){ }
 
 	public function getMine() : Mine{
 		return $this->mine;
+	}
+
+	/**
+	 * @since 4.4.0
+	 */
+	public function hasDiff() : bool {
+		return $this->diff;
 	}
 }

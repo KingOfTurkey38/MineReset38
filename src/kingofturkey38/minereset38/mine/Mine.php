@@ -6,26 +6,32 @@ namespace kingofturkey38\minereset38\mine;
 
 use Generator;
 use JsonSerializable;
-use kingofturkey38\minereset38\events\MineResetEvent;
+use SOFe\AwaitGenerator\Await;
 use kingofturkey38\minereset38\Main;
+use kingofturkey38\minereset38\events\MineResetEvent;
+use pocketmine\Server;
+use pocketmine\event\EventPriority;
+use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
-use pocketmine\Server;
 use pocketmine\world\World;
 
 class Mine implements JsonSerializable{
 
+	protected bool $diff = false;
 
 	public function tryReset(): Generator{
-		$event = new MineResetEvent($this);
+		$event = new MineResetEvent($this, $this->diff);
 		$event->call();
 
 		if($event->isCancelled()) return false;
+		if ($this->diffReset && !$this->diff) return false;
 
 		$this->lastReset = time();
 
 		if(($world = Server::getInstance()->getWorldManager()->getWorldByName($this->world)) !== null){
+			Await::g2c($this->watchDiff());
 			$broadcast = trim(str_replace("{mine}", $this->name, Main::getInstance()->getConfig()->getNested("messages.mine-reset-announcement")));
 			if ($broadcast !== "") {
 				Server::getInstance()->broadcastMessage($broadcast);
@@ -37,16 +43,19 @@ class Mine implements JsonSerializable{
 		return false;
 	}
 
-	public function reset(World $world): Generator{
-		$std = Main::getInstance()->getStd();
-
+	private function bb() : AxisAlignedBB {
 		$minX = min($this->pos1->getX(), $this->pos2->getX());
 		$maxX = max($this->pos1->getX(), $this->pos2->getX());
 		$minZ = min($this->pos1->getZ(), $this->pos2->getZ());
 		$maxZ = max($this->pos1->getZ(), $this->pos2->getZ());
 		$minY = min($this->pos1->getY(), $this->pos2->getY());
 		$maxY = max($this->pos1->getY(), $this->pos2->getY());
-		$bb = new AxisAlignedBB($minX, $minY, $minZ, $maxX, $maxY, $maxZ);
+		return new AxisAlignedBB($minX, $minY, $minZ, $maxX, $maxY, $maxZ);
+	}
+
+	public function reset(World $world): Generator{
+		$std = Main::getInstance()->getStd();
+		$bb = $this->bb();
 
 		foreach($world->getCollidingEntities($bb) as $e){
 			if($e instanceof Player){
@@ -60,9 +69,9 @@ class Mine implements JsonSerializable{
 		$count = 0;
 		$total = 0;
 		$started = time();
-		for($x = $minX; $x <= $maxX; $x++){
-			for($z = $minZ; $z <= $maxZ; $z++){
-				for($y = $minY; $y <= $maxY; $y++){
+		for($x = (int)$bb->minX; $x <= (int)$bb->maxX; $x++){
+			for($z = (int)$bb->minZ; $z <= (int)$bb->maxZ; $z++){
+				for($y = (int)$bb->minY; $y <= (int)$bb->maxY; $y++){
 					if(!$world->isLoaded()){
 						break 3;
 					}
@@ -143,8 +152,29 @@ class Mine implements JsonSerializable{
 			$data["lastReset"],
 		);
 		$mine->diffReset = $data["diffReset"] ?? true;
+		if ($mine->diffReset) Await::g2c($mine->watchDiff());
 
 		return $mine;
+	}
+
+	/**
+	 * @var \Closure(): void
+	 */
+	protected \Closure $closer;
+
+	/**
+	 * @since 4.4.0
+	 * @see $this->diff
+	 * @see $this->diffReset
+	 * 
+	 * @return \Generator<mixed, mixed, mixed, void>
+	 */
+	public function watchDiff() : \Generator {
+		$this->diff = false;
+		$std = Main::getInstance()->getStd();
+
+		yield from $std->awaitEvent(BlockBreakEvent::class, fn(BlockBreakEvent $e) : bool => $this->bb()->expand(.1, .1, .1)->isVectorInside($e->getBlock()->getPosition()), false, EventPriority::MONITOR, false);
+		$this->diff = true;
 	}
 
 	public function jsonSerialize(){
