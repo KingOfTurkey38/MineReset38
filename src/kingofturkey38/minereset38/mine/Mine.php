@@ -158,11 +158,6 @@ class Mine implements JsonSerializable{
 	}
 
 	/**
-	 * @var \Closure(): void
-	 */
-	protected \Closure $closer;
-
-	/**
 	 * @since 4.4.0
 	 * @see $this->diff
 	 * @see $this->diffReset
