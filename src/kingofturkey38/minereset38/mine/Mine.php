@@ -180,8 +180,10 @@ class Mine implements JsonSerializable{
 		$awaitExplode[1] = function (EntityExplodeEvent $e) : bool {
 			$bb = $this->bb()->expand(.1, .1, .1);
 			foreach ($e->getBlockList() as $exploded) {
-				$bb->isVectorInside($exploded->getPosition());
+				if ($bb->isVectorInside($exploded->getPosition())) return true;
 			}
+
+			return false;
 		};
 
 		yield from Await::race([
