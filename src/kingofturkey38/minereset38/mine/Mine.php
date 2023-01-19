@@ -12,6 +12,9 @@ use kingofturkey38\minereset38\events\MineResetEvent;
 use pocketmine\Server;
 use pocketmine\event\EventPriority;
 use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\block\BlockEvent;
+use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\event\entity\EntityExplodeEvent;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
@@ -19,7 +22,7 @@ use pocketmine\world\World;
 
 class Mine implements JsonSerializable{
 
-	protected bool $diff = false;
+	protected bool $diff = true; // Initial reset for the mine.
 
 	public function tryReset(): Generator{
 		$event = new MineResetEvent($this, $this->diff);
@@ -152,7 +155,8 @@ class Mine implements JsonSerializable{
 			$data["lastReset"],
 		);
 		$mine->diffReset = $data["diffReset"] ?? true;
-		if ($mine->diffReset) Await::g2c($mine->watchDiff());
+		// if ($mine->diffReset) Await::g2c($mine->watchDiff());
+		// Commented above line so the mine can have an initial reset.
 
 		return $mine;
 	}
@@ -168,7 +172,24 @@ class Mine implements JsonSerializable{
 		$this->diff = false;
 		$std = Main::getInstance()->getStd();
 
-		yield from $std->awaitEvent(BlockBreakEvent::class, fn(BlockBreakEvent $e) : bool => $this->bb()->expand(.1, .1, .1)->isVectorInside($e->getBlock()->getPosition()), false, EventPriority::MONITOR, false);
+		$awaitBreak = $awaitPlace = $awaitExplode = [
+			BlockBreakEvent::class, fn(BlockEvent $e) : bool => $this->bb()->expand(.1, .1, .1)->isVectorInside($e->getBlock()->getPosition()), false, EventPriority::MONITOR, false
+		];
+		$awaitPlace[0] = BlockPlaceEvent::class;
+		$awaitExplode[0] = EntityExplodeEvent::class;
+		$awaitExplode[1] = function (EntityExplodeEvent $e) : bool {
+			$bb = $this->bb()->expand(.1, .1, .1);
+			foreach ($e->getBlockList() as $exploded) {
+				$bb->isVectorInside($exploded->getPosition());
+			}
+		};
+
+		yield from Await::race([
+			$std->awaitEvent(...$awaitBreak),
+			$std->awaitEvent(...$awaitPlace),
+			$std->awaitEvent(...$awaitExplode),
+		]);
+
 		$this->diff = true;
 	}
 
