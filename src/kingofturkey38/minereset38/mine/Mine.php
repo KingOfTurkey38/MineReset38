@@ -104,6 +104,11 @@ class Mine implements JsonSerializable{
 		return $arr;
 	}
 
+	/**
+	 * @since 4.4.0
+	 */	
+	public bool $diffReset = true;
+
 
 	/**
 	 * @param string      $name
@@ -128,15 +133,18 @@ class Mine implements JsonSerializable{
 	}
 
 	public static function jsonDeserialize(array $data) : self{
-		return new Mine(
+		$mine = new Mine(
 			$data["name"],
 			new Vector3(...$data["pos1"]),
 			new Vector3(...$data["pos2"]),
 			$data["world"],
 			array_map(fn(array $v) => MineBlock::jsonDeserialize($v), $data["blocks"]),
 			$data["resetTime"],
-			$data["lastReset"]
+			$data["lastReset"],
 		);
+		$mine->diffReset = $data["diffReset"] ?? true;
+
+		return $mine;
 	}
 
 	public function jsonSerialize(){
@@ -148,6 +156,7 @@ class Mine implements JsonSerializable{
 			"blocks" => $this->blocks,
 			"resetTime" => $this->resetTime,
 			"lastReset" => $this->lastReset,
+			"diffReset" => $this->diffReset,
 		];
 	}
 }
