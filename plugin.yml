@@ -2,7 +2,7 @@
 name: minereset38
 version: 0.0.1
 main: kingofturkey38\minereset38\Main
-api: 4.3.1
+api: 4.4.0
 
 permissions:
   minereset38.mine:
