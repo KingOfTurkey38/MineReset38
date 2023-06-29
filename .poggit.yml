@@ -2,6 +2,7 @@
 build-by-default: true
 branches:
 - main
+- PM5
 projects:
   MineReset38:
     path: ""

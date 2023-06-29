@@ -6,24 +6,36 @@ namespace kingofturkey38\minereset38\mine;
 
 use Generator;
 use JsonSerializable;
-use SOFe\AwaitGenerator\Await;
-use kingofturkey38\minereset38\Main;
-use kingofturkey38\minereset38\events\MineResetEvent;
+
 use pocketmine\Server;
+use pocketmine\player\Player;
+
 use pocketmine\event\EventPriority;
+
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockEvent;
 use pocketmine\event\block\BlockPlaceEvent;
+
 use pocketmine\event\entity\EntityExplodeEvent;
+
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
-use pocketmine\player\Player;
+
 use pocketmine\world\World;
+
+use SOFe\AwaitGenerator\Await;
+
+use kingofturkey38\minereset38\Main;
+use kingofturkey38\minereset38\events\MineResetEvent;
 
 class Mine implements JsonSerializable{
 
+	/** @var bool $diff */
 	protected bool $diff = true; // Initial reset for the mine.
 
+	/**
+	 * @return Generator
+	 */
 	public function tryReset(): Generator{
 		$event = new MineResetEvent($this, $this->diff);
 		$event->call();
@@ -35,8 +47,10 @@ class Mine implements JsonSerializable{
 
 		if(($world = Server::getInstance()->getWorldManager()->getWorldByName($this->world)) !== null){
 			Await::g2c($this->watchDiff());
-			$broadcast = trim(str_replace("{mine}", $this->name, Main::getInstance()->getConfig()->getNested("messages.mine-reset-announcement")));
-			if ($broadcast !== "") {
+			$prefix = Main::getPrefix();
+            if(!is_string($prefix))$prefix = "";
+			$broadcast = trim(str_replace(["{mine}", "{prefix}"], [$this->name, $prefix], Main::getInstance()->getConfig()->getNested("messages.mine-reset-announcement")));
+			if($broadcast !== ""){
 				Server::getInstance()->broadcastMessage($broadcast);
 			}
 
@@ -46,7 +60,10 @@ class Mine implements JsonSerializable{
 		return false;
 	}
 
-	private function bb() : AxisAlignedBB {
+	/**
+	 * @return AxisAlignedBB
+	 */
+	private function bb() : AxisAlignedBB{
 		$minX = min($this->pos1->getX(), $this->pos2->getX());
 		$maxX = max($this->pos1->getX(), $this->pos2->getX());
 		$minZ = min($this->pos1->getZ(), $this->pos2->getZ());
@@ -56,16 +73,21 @@ class Mine implements JsonSerializable{
 		return new AxisAlignedBB($minX, $minY, $minZ, $maxX, $maxY, $maxZ);
 	}
 
+	/**
+	 * @param World $world
+	 * @return Generator
+	 */
 	public function reset(World $world): Generator{
 		$std = Main::getInstance()->getStd();
 		$bb = $this->bb();
 
-		foreach($world->getCollidingEntities($bb) as $e){
-			if($e instanceof Player){
-				$e->teleport($world->getSafeSpawn());
+		if(Main::getInstance()->getConfig()->get("teleport-to-spawn")){
+			foreach($world->getCollidingEntities($bb) as $e){
+				if($e instanceof Player){
+					$e->teleport($world->getSafeSpawn());
+				}
 			}
 		}
-
 
 		$blocks = yield from $this->getBlocksAsRandomArray();
 
@@ -101,7 +123,7 @@ class Mine implements JsonSerializable{
 		return true;
 	}
 
-	public function getBlocksAsRandomArray() {
+	public function getBlocksAsRandomArray(){
 		$arr = [];
 		$std = Main::getInstance()->getStd();
 
@@ -144,6 +166,10 @@ class Mine implements JsonSerializable{
 	){
 	}
 
+	/**
+	 * @param array $data
+	 * @return self
+	 */
 	public static function jsonDeserialize(array $data) : self{
 		$mine = new Mine(
 			$data["name"],
@@ -168,34 +194,48 @@ class Mine implements JsonSerializable{
 	 * 
 	 * @return \Generator<mixed, mixed, mixed, void>
 	 */
-	public function watchDiff() : \Generator {
+	public function watchDiff(): \Generator {
 		$this->diff = false;
 		$std = Main::getInstance()->getStd();
-
-		$awaitBreak = $awaitPlace = $awaitExplode = [
-			BlockBreakEvent::class, fn(BlockEvent $e) : bool => $this->bb()->expand(.1, .1, .1)->isVectorInside($e->getBlock()->getPosition()), false, EventPriority::MONITOR, false
+	
+		//$awaitBreak = $awaitPlace = $awaitExplode = [
+		$awaitBreak = $awaitExplode = [
+			BlockBreakEvent::class,
+			fn(BlockEvent $e) : bool => $this->bb()->expand(.1, .1, .1)->isVectorInside($e->getBlock()->getPosition()),
+			false,
+			EventPriority::MONITOR,
+			false
 		];
-		$awaitPlace[0] = BlockPlaceEvent::class;
+		//$awaitPlace[0] = BlockPlaceEvent::class;
 		$awaitExplode[0] = EntityExplodeEvent::class;
-		$awaitExplode[1] = function (EntityExplodeEvent $e) : bool {
+		$awaitExplode[1] = function(EntityExplodeEvent $e): bool {
 			$bb = $this->bb()->expand(.1, .1, .1);
-			foreach ($e->getBlockList() as $exploded) {
-				if ($bb->isVectorInside($exploded->getPosition())) return true;
+			foreach($e->getBlockList() as $exploded) {
+				if($bb->isVectorInside($exploded->getPosition())) {
+					return true;
+				}
 			}
-
+	
 			return false;
 		};
-
-		yield from Await::race([
+	
+		$race = [
 			$std->awaitEvent(...$awaitBreak),
-			$std->awaitEvent(...$awaitPlace),
+			//$std->awaitEvent(...$awaitPlace),
 			$std->awaitEvent(...$awaitExplode),
-		]);
-
+		];
+	
+		$result = yield from Await::race($race);
+	
 		$this->diff = true;
-	}
+	
+		return $result;
+	}	
 
-	public function jsonSerialize(){
+	/**
+	 * @return array
+	 */
+	public function jsonSerialize(): array{
 		return [
 			"name" => $this->name,
 			"pos1" => [$this->pos1->getX(), $this->pos1->getY(), $this->pos1->getZ()],
