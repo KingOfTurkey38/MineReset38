@@ -4,49 +4,70 @@ declare(strict_types=1);
 
 namespace kingofturkey38\minereset38\commands;
 
-use CortexPE\Commando\args\IntegerArgument;
-use CortexPE\Commando\args\RawStringArgument;
-use CortexPE\Commando\BaseSubCommand;
-use kingofturkey38\minereset38\Main;
-use kingofturkey38\minereset38\mine\Mine;
-use kingofturkey38\minereset38\mine\MineRegistry;
+use pocketmine\player\Player;
+
 use pocketmine\command\CommandSender;
+
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\EventPriority;
 use pocketmine\event\player\PlayerChatEvent;
-use pocketmine\player\Player;
+
 use pocketmine\utils\TextFormat;
 use pocketmine\world\Position;
+
 use SOFe\AwaitGenerator\Await;
 
+use CortexPE\Commando\args\IntegerArgument;
+use CortexPE\Commando\args\RawStringArgument;
+use CortexPE\Commando\BaseSubCommand;
+
+use kingofturkey38\minereset38\Main;
+use kingofturkey38\minereset38\mine\Mine;
+use kingofturkey38\minereset38\mine\MineRegistry;
+
 class MineCreateSubCommand extends BaseSubCommand{
-	protected function prepare() : void{
+
+	public function __construct(){
+		parent::__construct("create");
+		$this->setPermission("minereset38.mine");
+	}
+
+	/**
+	 * @return void
+	 */
+	protected function prepare(): void{
 		$this->registerArgument(0, new RawStringArgument("name"));
 		$this->registerArgument(1, new IntegerArgument("reset time"));
 	}
 
-	public function onRun(CommandSender $p, string $aliasUsed, array $args) : void{
+	/**
+	 * @param CommandSender $p
+	 * @param string $aliasUsed
+	 * @param array $args
+	 * @return void
+	 */
+	public function onRun(CommandSender $p, string $aliasUsed, array $args): void{
 		if(!$p instanceof Player) return;
 
 		$name = TextFormat::clean($args["name"]);
 
 		Await::f2c(function() use ($p, $args, $name){
 
-			$p->sendMessage(Main::PREFIX . "Break a block to select the first position");
+			$p->sendMessage(Main::getPrefix() . "Break a block to select the first position");
 			if(($pos1 = yield from $this->getMinePosition($p)) !== false){
-				$p->sendMessage(Main::PREFIX . "Break a block to select the second position");
+				$p->sendMessage(Main::getPrefix() . "Break a block to select the second position");
 				if(($pos2 = yield from $this->getMinePosition($p)) !== false){
 					if(!$p->isOnline()) return;
 
 					$mine = new Mine($name, $pos1, $pos2, $p->getWorld()->getFolderName(), [], abs($args["reset time"]), time());
 					MineRegistry::getInstance()->addMine($mine);
-					$p->sendMessage(Main::PREFIX . "§aSuccessfully created mine $name. §7(Use /mine addblock to add blocks)");
+					$p->sendMessage(Main::getPrefix() . "§aSuccessfully created mine $name. §7(Use /mine addblock to add blocks)");
 					return;
 				}
 			}
 
 			if($p->isOnline()){
-				$p->sendMessage(Main::PREFIX . "§cMine creation has been cancelled");
+				$p->sendMessage(Main::getPrefix() . "§cMine creation has been cancelled");
 			}
 		});
 

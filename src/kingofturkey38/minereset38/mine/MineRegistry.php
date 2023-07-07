@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace kingofturkey38\minereset38\mine;
 
-use kingofturkey38\minereset38\Main;
-use SOFe\AwaitGenerator\Await;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
+
+use SOFe\AwaitGenerator\Await;
+
+use kingofturkey38\minereset38\Main;
 
 class MineRegistry{
 	use SingletonTrait;
@@ -26,11 +28,19 @@ class MineRegistry{
 		}
 	}
 
-	public function getMine(string $name) : ?Mine{
+	/**
+	 * @param string $name
+	 * @return Mine|null
+	 */
+	public function getMine(string $name): ?Mine{
 		return $this->mines[$name] ?? null;
 	}
 
-	public function addMine(Mine $mine) : void{
+	/**
+	 * @param Mine $mine
+	 * @return void
+	 */
+	public function addMine(Mine $mine): void{
 		$this->mines[$mine->name] = $mine;
 
 		Await::f2c(function() use ($mine){
@@ -55,15 +65,26 @@ class MineRegistry{
 		});
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getAllMines(): array {
 		return $this->mines;
 	}
 
-	public function removeMine(string $name) : void{
+	/**
+	 * @param string $name
+	 * @return void
+	 */
+	public function removeMine(string $name): void{
 		unset($this->mines[$name]);
 	}
 
-	public function onClose(Plugin $plugin) : void{
+	/**
+	 * @param Plugin $plugin
+	 * @return void
+	 */
+	public function onClose(Plugin $plugin): void{
 		$this->config->setAll($this->mines);
 		$this->config->save();
 	}

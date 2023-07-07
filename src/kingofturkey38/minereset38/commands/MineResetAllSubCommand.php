@@ -4,28 +4,47 @@ declare(strict_types=1);
 
 namespace kingofturkey38\minereset38\commands;
 
-use CortexPE\Commando\BaseSubCommand;
-use kingofturkey38\minereset38\Main;
-use kingofturkey38\minereset38\mine\MineRegistry;
-use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+
+use pocketmine\command\CommandSender;
+
 use SOFe\AwaitGenerator\Await;
 
+use CortexPE\Commando\BaseSubCommand;
+
+use kingofturkey38\minereset38\Main;
+use kingofturkey38\minereset38\mine\MineRegistry;
+
 class MineResetAllSubCommand extends BaseSubCommand{
-	protected function prepare() : void{
+
+	public function __construct(){
+		parent::__construct("resetall");
+		$this->setPermission("minereset38.mine");
 	}
 
-	public function onRun(CommandSender $p, string $aliasUsed, array $args) : void{
+	/**
+	 * @return void
+	 */
+	protected function prepare(): void{
+	}
+
+	/**
+	 * @param CommandSender $p
+	 * @param string $aliasUsed
+	 * @param array $args
+	 * @return void
+	 */
+	public function onRun(CommandSender $p, string $aliasUsed, array $args): void{
 		Await::f2c(function() use ($p){
 			foreach(MineRegistry::getInstance()->getAllMines() as $mine){
-				$this->msg($p, Main::PREFIX . "Trying to reset mine §c{$mine->name}");
+				$this->msg($p, Main::getPrefix() . "Trying to reset mine §c{$mine->name}");
 
 
 				$result = yield from $mine->tryReset();
 
 				if($result === true){
-					$this->msg($p, Main::PREFIX . "Mine §c{$mine->name}§7 has been reset.");
-				}else $this->msg($p, Main::PREFIX . "Failed to reset mine §c{$mine->name}");
+					$this->msg($p, Main::getPrefix() . "Mine §c{$mine->name}§7 has been reset.");
+				}else $this->msg($p, Main::getPrefix() . "Failed to reset mine §c{$mine->name}");
 			}
 		});
 	}

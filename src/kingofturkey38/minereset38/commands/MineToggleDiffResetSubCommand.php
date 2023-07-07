@@ -4,16 +4,28 @@ declare(strict_types=1);
 
 namespace kingofturkey38\minereset38\commands;
 
+use pocketmine\player\Player;
+
+use pocketmine\command\CommandSender;
+
 use CortexPE\Commando\BaseSubCommand;
 use CortexPE\Commando\args\BooleanArgument;
 use CortexPE\Commando\args\RawStringArgument;
+
 use kingofturkey38\minereset38\Main;
 use kingofturkey38\minereset38\mine\MineRegistry;
-use pocketmine\command\CommandSender;
-use pocketmine\player\Player;
 
 class MineToggleDiffResetSubCommand extends BaseSubCommand{
-	protected function prepare() : void{
+	
+	public function __construct(){
+		parent::__construct("diffreset");
+		$this->setPermission("minereset38.mine");
+	}
+
+	/**
+	 * @return void
+	 */
+	protected function prepare(): void{
 		$this->registerArgument(0, new RawStringArgument("name"));
 		$this->registerArgument(1, new BooleanArgument("enabled", true));
 	}
@@ -27,12 +39,12 @@ class MineToggleDiffResetSubCommand extends BaseSubCommand{
 		$mine = MineRegistry::getInstance()->getMine($args["name"]);
 
 		if($mine === null){
-			$p->sendMessage(Main::PREFIX . "Invalid mine name");
+			$p->sendMessage(Main::getPrefix() . "Invalid mine name");
 			return;
 		}
 
 		$enabled = $mine->diffReset = $args["enabled"] ?? !$mine->diffReset;
-		$p->sendMessage(Main::PREFIX . "Set the {$mine->name} reset mode to " . ($enabled
+		$p->sendMessage(Main::getPrefix() . "Set the {$mine->name} reset mode to " . ($enabled
 				? "§aOn Changed"
 				: "§rAlways"
 			)

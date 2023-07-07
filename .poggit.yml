@@ -2,6 +2,7 @@
 build-by-default: true
 branches:
 - main
+- PM5
 projects:
   MineReset38:
     path: ""
@@ -9,9 +10,11 @@ projects:
     libs:
       - src: sof3/await-generator/await-generator
         version: ^3.1.0
-      - src: sof3/await-std/await-std
-        version: ^0.2.0
-      - src: CortexPE/Commando/Commando
-        version: ^3.0.0
-        branch: PM4
+      - src: ACM-PocketMine-MP/await-std/await-std
+        version: ^0.3.0
+      - src: ACM-PocketMine-MP/Commando/Commando
+        version: ^3.2.0
+        branch: PM5
+      - src: muqsit/simplepackethandler/SimplePacketHandler
+        version: ^0.1.3
 ...
