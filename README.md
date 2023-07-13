@@ -1,5 +1,5 @@
 # MineReset38
-High performance mine reset plugin for PocketMine-MP 4.0.0
+High performance mine reset plugin for PocketMine-MP 5.0.0
 Unlike other plugins, this plugin is not threaded but asynchronous.
 
 When a mine resets, it teleports the players inside the mine to the spawnpoint of that world.

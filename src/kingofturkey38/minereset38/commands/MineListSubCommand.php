@@ -16,7 +16,7 @@ use kingofturkey38\minereset38\mine\MineRegistry;
 class MineListSubCommand extends BaseSubCommand{
 
 	public function __construct(){
-		parent::__construct("list");
+		parent::__construct("list", "", []);
 		$this->setPermission("minereset38.mine");
 	}
 
