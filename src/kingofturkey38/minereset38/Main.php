@@ -43,7 +43,7 @@ class Main extends PluginBase{
 		if(!PacketHooker::isRegistered()){
 			PacketHooker::register($this);
 		}
-		$this->getServer()->getCommandMap()->register("minereset38", new MineCommand($this, "mine"));
+		$this->getServer()->getCommandMap()->register("minereset38", new MineCommand);
 	}
 
 	/**

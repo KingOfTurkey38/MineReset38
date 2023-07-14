@@ -18,7 +18,7 @@ use kingofturkey38\minereset38\mine\MineRegistry;
 class MineRemoveBlockSubCommand extends BaseSubCommand{
 
 	public function __construct(){
-		parent::__construct("removeblock");
+		parent::__construct("removeblock", "", []);
 		$this->setPermission("minereset38.mine");
 	}
 

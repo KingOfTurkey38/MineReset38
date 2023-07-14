@@ -17,7 +17,7 @@ use kingofturkey38\minereset38\mine\MineRegistry;
 class MineDeleteSubCommand extends BaseSubCommand{
 
 	public function __construct(){
-		parent::__construct("delete");
+		parent::__construct("delete", "", []);
 		$this->setPermission("minereset38.mine");
 	}
 

@@ -18,7 +18,7 @@ use kingofturkey38\minereset38\mine\MineRegistry;
 class MineInfoSubCommand extends BaseSubCommand{
 
 	public function __construct(){
-		parent::__construct("info");
+		parent::__construct("info", "", []);
 		$this->setPermission("minereset38.mine");
 	}
 

@@ -18,7 +18,7 @@ use kingofturkey38\minereset38\mine\MineRegistry;
 class MineToggleDiffResetSubCommand extends BaseSubCommand{
 	
 	public function __construct(){
-		parent::__construct("diffreset");
+		parent::__construct("diffreset", "", []);
 		$this->setPermission("minereset38.mine");
 	}
 

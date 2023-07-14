@@ -13,7 +13,7 @@ use kingofturkey38\minereset38\Main;
 class MineCommand extends BaseCommand{
 
 	public function __construct(){
-		parent::__construct(Main::getInstance(), "mine");
+		parent::__construct(Main::getInstance(), "mine", "", ["minereset38"]);
 		$this->setPermission("minereset38.mine");
 	}
 
@@ -21,16 +21,16 @@ class MineCommand extends BaseCommand{
 	 * @return void
 	 */
 	protected function prepare(): void{
-		$this->registerSubCommand(new MineCreateSubCommand("create"));
-		$this->registerSubCommand(new MineInfoSubCommand("info"));
-		$this->registerSubCommand(new MineListSubCommand("list"));
-		$this->registerSubCommand(new MineResetSubCommand("reset"));
-		$this->registerSubCommand(new MineAddBlockSubCommand("addblock"));
-		$this->registerSubCommand(new MineRemoveBlockSubCommand("removeblock"));
-		$this->registerSubCommand(new MineResetTimeSubCommand("setresettime"));
-		$this->registerSubCommand(new MineDeleteSubCommand("delete"));
-		$this->registerSubCommand(new MineResetAllSubCommand("resetall"));
-		$this->registerSubCommand(new MineToggleDiffResetSubCommand("diffreset"));
+		$this->registerSubCommand(new MineCreateSubCommand);
+		$this->registerSubCommand(new MineInfoSubCommand);
+		$this->registerSubCommand(new MineListSubCommand);
+		$this->registerSubCommand(new MineResetSubCommand);
+		$this->registerSubCommand(new MineAddBlockSubCommand);
+		$this->registerSubCommand(new MineRemoveBlockSubCommand);
+		$this->registerSubCommand(new MineResetTimeSubCommand);
+		$this->registerSubCommand(new MineDeleteSubCommand);
+		$this->registerSubCommand(new MineResetAllSubCommand);
+		$this->registerSubCommand(new MineToggleDiffResetSubCommand);
 	}
 
 	/**

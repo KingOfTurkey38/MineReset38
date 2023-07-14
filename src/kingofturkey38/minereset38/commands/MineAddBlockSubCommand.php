@@ -26,7 +26,7 @@ use kingofturkey38\minereset38\mine\MineRegistry;
 class MineAddBlockSubCommand extends BaseSubCommand{
 
 	public function __construct(){
-		parent::__construct("addblock");
+		parent::__construct("addblock", "", []);
 		$this->setPermission("minereset38.mine");
 	}
 
