@@ -8,7 +8,6 @@ use pocketmine\player\Player;
 
 use pocketmine\command\CommandSender;
 
-use CortexPE\Commando\args\IntegerArgument;
 use CortexPE\Commando\args\RawStringArgument;
 use CortexPE\Commando\BaseSubCommand;
 
@@ -27,7 +26,7 @@ class MineRemoveBlockSubCommand extends BaseSubCommand{
 	 */
 	protected function prepare(): void{
 		$this->registerArgument(0, new RawStringArgument("name"));
-		$this->registerArgument(1, new IntegerArgument("index"));
+		$this->registerArgument(1, new RawStringArgument("index"));
 	}
 
 	/**
