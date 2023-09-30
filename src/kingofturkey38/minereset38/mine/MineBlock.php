@@ -39,7 +39,7 @@ class MineBlock implements JsonSerializable{
 	 */
 	public function jsonSerialize(): array{
 		return [
-			"blockID" => $this->block->getName(),
+			"blockID" => StringToItemParser::getInstance()->lookupBlockAliases($this->block)[0],
 			"chance" => $this->chance
 		];
 	}

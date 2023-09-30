@@ -1,8 +1,8 @@
 --- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/KingOfTurkey38/MineReset38
 build-by-default: true
 branches:
-- main
 - PM5
+- main
 projects:
   MineReset38:
     path: ""
